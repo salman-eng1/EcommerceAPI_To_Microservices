@@ -1,58 +1,113 @@
-// const { v4: uuidv4 } = require("uuid");
-// const sharp = require("sharp");
-// const asyncHandler = require("express-async-handler");
-// const Brand = require("../models/brandModel");
-// const factory = require("../../../../shared/handlers/handlerFactory");
-// const path = require('path');
+const { v4: uuidv4 } = require("uuid");
+const sharp = require("sharp");
+const asyncHandler = require("express-async-handler");
+const Brand = require("../models/brandModel");
+const BrandService = require("../services/brandService");
+const { uploadSingleImage } = require("../middlewares/uploadImageMiddlware");
+const ApiError = require("../utils/apiError");
+const ApiFeatures = require("../utils/apiFeatures");
+class BrandController {
+  constructor() {
+    this.brandService = new BrandService();
+  }
 
-// const {
-//   uploadSingleImage,
-// } = require("../../../../shared/middlewares/uploadImageMiddlware");
+  //Memory Storage
+  uploadBrandImage = uploadSingleImage("image");
 
-// //Memory Storage
-// exports.uploadBrandImage = uploadSingleImage("image");
+  // use memory storage only when you have to process the image
+  resizeImage = asyncHandler(async (req, res, next) => {
+    const fileName = `brand-${uuidv4()}-${Date.now()}.jpeg`;
+    await sharp(req.file.buffer)
+      .resize(600, 600)
+      .toFormat("jpeg")
+      .jpeg({ quality: 95 })
+      .toFile(`uploads/brands/${fileName}`);
 
-// // use memory storage only when you have to process the image
-// exports.resizeImage = asyncHandler(async (req, res, next) => {
-//   const fileName = `brand-${uuidv4()}-${Date.now()}.jpeg`;
-//   await sharp(req.file.buffer)
-//     .resize(600, 600)
-//     .toFormat("jpeg")
-//     .jpeg({ quality: 95 })
-//     .toFile(path.join(__dirname, '../../../../shared/uploads/brands/', fileName));
+    req.body.image = fileName;
 
-//   req.body.image = fileName;
-//   next();
-// });
-// // @desc     get list of brands
-// //@route     GET .api/v1/brands
-// //access     public
-// exports.getBrands = factory.getAll(Brand);
+    next();
+  });
+  // @desc     get list of brands
+  //@route     GET .api/v1/brands
+  //access     public
+  getBrands = asyncHandler(async (req, res) => {
+    let filter = {};
+    if (req.filterObj) {
+      filter = req.filterObj;
+    }
+    // Build query
+    const brandsCounts = await Brand.countDocuments();
+    const apiFeatures = new ApiFeatures(Brand.find(filter), req.query)
+      .paginate(brandsCounts)
+      .filter()
+      .search("Brand")
+      .limitFields()
+      .sort();
 
-// // @desc     getBrandById
-// //@route     GET .api/v1/brands/:id
-// //access     public
-// exports.getBrand = factory.getOne(Brand);
+    // Execute query
+    const { mongooseQuery, paginationResult } = apiFeatures;
+    const brands = await mongooseQuery;
 
-// // async & await used to allow java script to execute the remaining codes before this function is executed to avoid block execution for remaining code
-// //asyncHandler is responsible for catching error then send it to expresss
-// // req represent incoming request
-// //res represent the returend response
-// // (Brand) is the parameter we pass to the data parameter which represent the response data
+    res
+      .status(200)
+      .json({ results: brands.length, paginationResult, data: brands });
+  });
 
-// // @desc     createBrand
-// //@route     POST .api/v1/brands
-// //access     private
+  // @desc     getBrandById
+  //@route     GET .api/v1/brands/:id
+  //access     public
+  getBrand = asyncHandler(async (req, res, next) => {
+    const { id } = req.params;
+    // 1) Build query
+    let query = this.brandService.getBrandById(id);
 
-// exports.createBrand = factory.createOne(Brand);
-// // @desc     update specific Brand
-// //@route     PUT .api/v1/brands/:id
-// //access     private
+    // 2) Execute query
+    const brand = await query;
 
-// exports.updateBrand = factory.updateOne(Brand);
+    if (!brand) {
+      return next(new ApiError(`No brand for this id ${id}`, 404));
+    }
+    res.status(200).json({ data: brand });
+  });
 
-// // @desc     update specific Brand
-// //@route     DELETE /api/v1/brands/:id
-// //access     private
+  // @desc     createBrand
+  //@route     POST .api/v1/brands
+  //access     private
 
-// exports.deleteBrand = factory.deleteOne(Brand);
+  createBrand = asyncHandler(async (req, res) => {
+    const brand = await this.brandService.createBrand(req.body);
+    res.status(201).json({ data: brand });
+  });
+  // @desc     update specific Brand
+  //@route     PUT .api/v1/brands/:id
+  //access     private
+
+  updateBrand = asyncHandler(async (req, res, next) => {
+    const brand = await this.brandService.updateBrand(req.params.id, req.body);
+
+    if (!brand) {
+      return next(new ApiError(`No brand for this id ${req.params.id}`, 404));
+    }
+    // Trigger "save" event when update brand
+    brand.save();
+    res.status(200).json({ data: brand });
+  });
+
+  // @desc     update specific Brand
+  //@route     DELETE /api/v1/brands/:id
+  //access     private
+
+  deleteBrand = asyncHandler(async (req, res, next) => {
+    const { id } = req.params;
+    const brand = await this.brandService.deleteBrand(id);
+
+    if (!brand) {
+      return next(new ApiError(`No brand for this id ${id}`, 404));
+    }
+
+    // Trigger "remove" event when update brand
+    res.status(204).send();
+  });
+}
+
+module.exports = BrandController;

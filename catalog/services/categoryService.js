@@ -7,7 +7,7 @@ class CategoryService {
     this.categoryRepository = new CatalogRepository(Category);
   }
 
-  async createCategory(category, name) {
+  async createCategory(category) {
     try {
       const createdCategory = await this.categoryRepository.create(category);
       return createdCategory;

@@ -87,11 +87,12 @@ class AuthController {
     }
 
     // 4) Check if user change his password after token created
-    if (currentUser.passwordChangedAt) {
+    else if (currentUser.passwordChangedAt) {
       const passChangedTimestamp = parseInt(
         currentUser.passwordChangedAt.getTime() / 1000,
         10
       );
+
       // Password changed after token created (Error)
       if (passChangedTimestamp > decoded.iat) {
         return next(
@@ -101,6 +102,12 @@ class AuthController {
           )
         );
       }
+    }
+
+    if (currentUser.active === false) {
+      return next(
+        new ApiError("your not logged in, please login to proceed", 401)
+      );
     }
 
     req.user = currentUser;
@@ -124,7 +131,7 @@ class AuthController {
       );
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    const users = await this.userService.updateUser(decoded.userId, {
+    await this.userService.updateUser(decoded.userId, {
       token: "",
       active: false,
     });
@@ -168,7 +175,6 @@ class AuthController {
     // Add expiration time for password reset code (10 min)
     user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
     user.passwordResetVerified = false;
-
     await user.save();
 
     // 3) Send the reset code via email
@@ -242,7 +248,7 @@ class AuthController {
     user.passwordResetCode = undefined;
     user.passwordResetExpires = undefined;
     user.passwordResetVerified = undefined;
-
+    user.passwordChangedAt = Date.now();
     await user.save();
 
     // 3) if everything is ok, generate token

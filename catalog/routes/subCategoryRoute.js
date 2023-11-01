@@ -1,49 +1,45 @@
-// const express = require("express");
+const express = require("express");
+const SubCategoryController = require("../controllers/subCategoryController");
+const IsAuthenticated = require("../middlewares/isAuthenticated");
+const SubCategoryValidator = require("../utils/validators/subCategoryValidator");
+const subCategoryValidator = new SubCategoryValidator();
 
-// const router = express.Router({ mergeParams: true });
+const subCategoryController = new SubCategoryController();
 
-// const {
-//   createSubCategory,
-//   getSubCategories,
-//   getSubCategory,
-//   updateSubCategory,
-//   deleteSubCategory,
-//   setCategoryIdToBody,
-//   createFilterObj,
-// } = require("../controllers/subCategoryController");
-// const {
-//   createSubCategoryValidator,
-//   getSubCategoryValidator,
-//   updateSubCategoryValidator,
-//   deleteSubCategoryValidator,
-// } = require("../utils/validators/subCategoryValidator");
+const isAuthenticated = new IsAuthenticated();
 
-// const handlerFactory = require("../../../../shared/handlers/handlerFactory");
+const router = express.Router({ mergeParams: true });
 
-// router
-//   .route("/")
-//   .post(
-//     handlerFactory.protectService,
-//     handlerFactory.allowedTo("admin", "manager"),
-//     setCategoryIdToBody,
-//     createSubCategoryValidator,
-//     createSubCategory
-//   )
-//   .get(createFilterObj, getSubCategories);
+router
+  .route("/")
+  .post(
+    isAuthenticated.protectService,
+    isAuthenticated.allowedTo("admin", "manager"),
+    subCategoryController.setCategoryIdToBody,
+    subCategoryValidator.createSubCategoryValidator,
+    subCategoryController.createSubCategory
+  )
+  .get(
+    subCategoryController.createFilterObj,
+    subCategoryController.getSubCategories
+  );
 
-// router
-//   .route("/:id")
-//   .get(getSubCategoryValidator, getSubCategory)
-//   .put(
-//     handlerFactory.protectService,
-//     handlerFactory.allowedTo("admin", "manager"),
-//     updateSubCategoryValidator,
-//     updateSubCategory
-//   )
-//   .delete(
-//     handlerFactory.protectService,
-//     handlerFactory.allowedTo("admin", "manager"),
-//     deleteSubCategoryValidator,
-//     deleteSubCategory
-//   );
-// module.exports = router;
+router
+  .route("/:id")
+  .get(
+    subCategoryValidator.getSubCategoryValidator,
+    subCategoryController.getSubCategory
+  )
+  .put(
+    isAuthenticated.protectService,
+    isAuthenticated.allowedTo("admin", "manager"),
+    subCategoryValidator.updateSubCategoryValidator,
+    subCategoryController.updateSubCategory
+  )
+  .delete(
+    isAuthenticated.protectService,
+    isAuthenticated.allowedTo("admin", "manager"),
+    subCategoryValidator.deleteSubCategoryValidator,
+    subCategoryController.deleteSubCategory
+  );
+module.exports = router;

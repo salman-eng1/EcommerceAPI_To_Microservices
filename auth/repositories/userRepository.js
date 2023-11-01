@@ -13,7 +13,6 @@ class UsersRepository {
     const user = await this.user.findByIdAndUpdate(userId, newData, {
       new: true,
     });
-    console.log(newData)
     return user;
   }
 

@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const dotenv = require("dotenv");
 const ApiError = require("../utils/apiError");
+const { axiosRequest } = require("../utils/axios");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const CategoryService = require("../services/categoryService");
@@ -35,20 +36,17 @@ class IsAuthenticated {
       // 2) Verify token (no change happens, expired token)
       this.decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-      const response = await axios({
-        method: "get",
-        url: `${process.env.authService}/api/v1/users/${this.decoded.userId}`,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
+      const response = await axiosRequest(
+        "get",
+        `${process.env.authService}/api/v1/users/${this.decoded.userId}`,
+        token
+      );
       this.role = response.data.data.role;
       next();
     } catch (err) {
-      console.log(err.response.data.message,err.response.data.status)
-      next(new ApiError(err.response.data.message,err.response.status));
+      const message = err.response.data.message;
+      const status = err.response.status;
+      next(new ApiError(message, status));
     }
   });
 

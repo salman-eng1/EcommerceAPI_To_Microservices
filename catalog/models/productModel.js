@@ -6,6 +6,7 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      unique: true,
       minlength: [3, "Too short product title"],
       maxlength: [100, "Too long product title"],
     },
@@ -22,7 +23,7 @@ const productSchema = new mongoose.Schema(
     quantity: {
       type: Number,
       required: [true, "product quantity is required"],
-      default: 0
+      default: 0,
     },
     sold: {
       type: Number,
@@ -38,13 +39,13 @@ const productSchema = new mongoose.Schema(
       type: Number,
       trim: true,
       maxlength: [20, "Too long product price"],
-      default: 0
+      default: 0,
     },
     colors: [String],
 
     imageCover: {
       type: String,
-      required: [true, "product image cover is required"],
+      // required: [true, "product image cover is required"],
     },
     images: [String],
 
@@ -82,8 +83,8 @@ const setImageURL = (doc) => {
     doc.imageCover = imageUrl;
   }
   if (doc.images) {
-  const imageList=[];
-    doc.images.forEach(image => {
+    const imageList = [];
+    doc.images.forEach((image) => {
       const imageUrl = `${process.env.BASE_URL}/products/${image}`;
       imageList.push(imageUrl);
     });
@@ -101,6 +102,7 @@ productSchema.post("save", (doc) => {
 productSchema.post("init", (doc) => {
   setImageURL(doc);
 });
+
 productSchema.pre(/^find/, function (next) {
   this.populate({
     //(this) will be used to refer to the query that is using find

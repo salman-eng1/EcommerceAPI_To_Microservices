@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const ApiError = require("../utils/apiError");
 const ApiFeatures = require("../utils/apiFeatures");
 const createToken = require("../utils/createToken");
+const jwt = require("jsonwebtoken");
 
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddlware");
 const UserService = require("../services/userService");

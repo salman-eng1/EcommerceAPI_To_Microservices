@@ -1,51 +1,41 @@
-// const express = require("express");
+const express = require("express");
+const BrandValidator = require("../utils/validators/brandValidator");
+const BrandController = require("../controllers/brandController");
+const IsAuthenticated = require("../middlewares/isAuthenticated");
+const isAuthenticated = new IsAuthenticated();
+const brandController = new BrandController();
+const brandValidator = new BrandValidator();
 
-// const router = express.Router();
-// const {
-//   getBrandValidator,
-//   updateBrandValidator,
-//   deleteBrandValidator,
-//   createBrandValidator,
-// } = require("../utils/validators/brandValidator");
-// const {
-//   getBrands,
-//   createBrand,
-//   getBrand,
-//   updateBrand,
-//   deleteBrand,
-//   uploadBrandImage,
-//   resizeImage,
-// } = require("../controllers/brandController");
+const router = express.Router();
 
-// //get all sub categories for specific parent Brand by its ID
-// const handlerFactory = require("../../../../shared/handlers/handlerFactory");
+//get all sub categories for specific parent Brand by its ID
 
-// router
-//   .route("/")
-//   .get(getBrands)
-//   .post(
-//     handlerFactory.protectService,
-//     handlerFactory.allowedTo("admin", "manager"),
-//     uploadBrandImage,
-//     resizeImage,
-//     createBrandValidator,
-//     createBrand
-//   );
-// router
-//   .route("/:id")
-//   .get(getBrandValidator, getBrand)
-//   .put(
-//     handlerFactory.protectService,
-//     handlerFactory.allowedTo("admin", "manager"),
-//     uploadBrandImage,
-//     resizeImage,
-//     updateBrandValidator,
-//     updateBrand
-//   )
-//   .delete(
-//     handlerFactory.protectService,
-//     handlerFactory.allowedTo("admin", "manager"),
-//     deleteBrandValidator,
-//     deleteBrand
-//   );
-// module.exports = router;
+router
+  .route("/")
+  .get(brandController.getBrands)
+  .post(
+    isAuthenticated.protectService,
+    isAuthenticated.allowedTo("admin", "manager"),
+    brandController.uploadBrandImage,
+    brandController.resizeImage,
+    brandValidator.createBrandValidator,
+    brandController.createBrand
+  );
+router
+  .route("/:id")
+  .get(brandValidator.getBrandValidator, brandController.getBrand)
+  .put(
+    isAuthenticated.protectService,
+    isAuthenticated.allowedTo("admin", "manager"),
+    brandController.uploadBrandImage,
+    brandController.resizeImage,
+    brandValidator.updateBrandValidator,
+    brandController.updateBrand
+  )
+  .delete(
+    isAuthenticated.protectService,
+    isAuthenticated.allowedTo("admin", "manager"),
+    brandValidator.deleteBrandValidator,
+    brandController.deleteBrand
+  );
+module.exports = router;

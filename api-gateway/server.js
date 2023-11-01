@@ -3,8 +3,6 @@
 const express = require("express");
 const httpProxy = require("http-proxy");
 
-
-
 const proxy = httpProxy.createProxyServer();
 const app = express();
 const dotenv = require("dotenv");
@@ -13,7 +11,6 @@ dotenv.config(".env");
 const api = "api/v1";
 // Route requests to the auth service
 app.use(`/${api}/auth`, (req, res) => {
-
   proxy.web(req, res, { target: `http://localhost:3000/${api}/auth` });
 });
 
