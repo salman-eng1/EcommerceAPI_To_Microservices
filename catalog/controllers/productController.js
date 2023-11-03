@@ -11,12 +11,12 @@ const ProductService = require("../services/productService");
 // const RabbitMQCon = require("../utils/amqplibCon");
 // const amqpURL = process.env.amqpURL;
 
-//    const connection =async()=>await RabbitMQCon.connect(amqpURL, "Product").then( ()=>{
-//     RabbitMQCon.consume('Product',()=>console.log("received message"))
-//    }).catch((err)=>{
-//     console.log(`connection failed: ${err}`)
-//    });
-//    connection()
+  //  const connection =async()=>await MessagingService.connect(amqpURL).then( ()=>{
+  //   MessagingService.consume('Basket',()=>console.log("listening"))
+  //  }).catch((err)=>{
+  //   console.log(`connection failed: ${err}`)
+  //  });
+  //  connection()
 
 // exports.sendMsgToQueue = asyncHandler(async (req, res) => {
 //   const product = req.body;

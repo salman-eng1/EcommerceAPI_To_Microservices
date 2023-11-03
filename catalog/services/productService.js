@@ -1,12 +1,14 @@
 const CatalogRepository = require("../repositories/catalogRepository");
 const Product = require("../models/productModel"); // Change import to Product
 
-class ProductService { // Change class name to ProductService
+class ProductService {
+  // Change class name to ProductService
   constructor() {
     this.productRepository = new CatalogRepository(Product); // Change repository to productRepository
   }
 
-  async createProduct(product) { // Change method name
+  async createProduct(product) {
+    // Change method name
     try {
       const createdProduct = await this.productRepository.create(product); // Change variable names
       return createdProduct;
@@ -15,7 +17,8 @@ class ProductService { // Change class name to ProductService
     }
   }
 
-  async getProductById(productId) { // Change method name
+  async getProductById(productId) {
+    // Change method name
     try {
       const product = await this.productRepository.findById(productId); // Change variable names
       return product;
@@ -24,7 +27,8 @@ class ProductService { // Change class name to ProductService
     }
   }
 
-  async getAllProducts() { // Change method name
+  async getAllProducts() {
+    // Change method name
     try {
       const products = await this.productRepository.findAll(); // Change variable names
       return products;
@@ -33,7 +37,8 @@ class ProductService { // Change class name to ProductService
     }
   }
 
-  async deleteProduct(productId) { // Change method name
+  async deleteProduct(productId) {
+    // Change method name
     try {
       const product = await this.productRepository.findByIdAndDelete(productId); // Change variable names
       return product;
@@ -42,16 +47,21 @@ class ProductService { // Change class name to ProductService
     }
   }
 
-  async updateProduct(productId, newData) { // Change method name
+  async updateProduct(productId, newData) {
+    // Change method name
     try {
-      const product = await this.productRepository.findByIdAndUpdate(productId, newData); // Change variable names
+      const product = await this.productRepository.findByIdAndUpdate(
+        productId,
+        newData
+      ); // Change variable names
       return product;
     } catch (err) {
       console.log("DB Error >> Cannot Update Product", err); // Change log message
     }
   }
 
-  async getProductByKey(key) { // Change method name
+  async getProductByKey(key) {
+    // Change method name
     try {
       const product = await this.productRepository.findOne(key); // Change variable names
       return product; // Change variable names

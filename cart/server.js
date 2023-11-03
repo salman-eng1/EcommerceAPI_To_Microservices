@@ -5,7 +5,6 @@ const mountRoutes = require("./routes");
 const morgan = require("morgan");
 dotenv.config(".env");
 const globalError = require("./middlewares/errorMiddleware");
-
 const MessagingService = require("./services/messagingService");
 
 (async function () {
@@ -19,13 +18,16 @@ const MessagingService = require("./services/messagingService");
     process.env.EXCHANGE_NAME,
     process.env.CONSUMER_ROUTING_KEY
   );
-  await MessagingService.consumeMessages(process.env.CONSUMER_QUEUE_NAME);
+  await MessagingService.consumeMessages(process.env.CONSUMER_QUEUE_NAME)
 })();
 
 dbConnection(process.env.DB_URI);
 
 const app = express();
 app.use(express.json());
+
+app.use(express.urlencoded({ extended: true }));
+
 app.use(morgan("dev"));
 
 mountRoutes(app);

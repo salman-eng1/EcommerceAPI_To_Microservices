@@ -24,8 +24,8 @@ app.use(`/${api}/catalog`, (req, res) => {
 });
 
 // Route requests to the order service
-app.use(`/${api}/orders`, (req, res) => {
-  proxy.web(req, res, { target: `http://localhost:3002/${api}/orders` });
+app.use(`/${api}/cart`, (req, res) => {
+  proxy.web(req, res, { target: `http://localhost:3002/${api}/cart` });
 });
 
 // Start the server
