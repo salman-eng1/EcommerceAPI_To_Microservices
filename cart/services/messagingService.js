@@ -1,4 +1,7 @@
 const amqplib = require("amqplib");
+const StockService = require("./stockService");
+const stockService=new StockService()
+
 var channel, connection;
 
 exports.connect = async () => {
@@ -23,12 +26,25 @@ exports.createAndBindQueue = async (queueName, exchangeName, routingKey) => {
 };
 
 exports.consumeMessages = async (queueName) => {
-  await channel.consume(queueName, (msg) => {
+  await channel.consume(queueName, async (msg) => {
     if (msg) {
-      console.log(`Received: ${msg.content.toString()}`);
+      console.log(`Received: ${msg.content}`);
       // Acknowledge the message if it's processed successfully.
       channel.ack(msg);
-    }
+      const message = await JSON.parse(msg.content.toString());
+      
+      const productStock = await stockService.getStockByKey({productId:
+        message.productId})
+        if (productStock){
+          productStock.stock= message.stock
+          await  productStock.save()
+        }
+      
+       
+      if(!productStock){
+
+      await stockService.createStock(message)
+    }}
   });
   console.log(`${queueName} queue consumer is listening`);
 };

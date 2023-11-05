@@ -4,10 +4,15 @@ const CartService = require("../services/cartService");
 // const Coupon = require("../models/couponModel");
 const Cart = require("../models/cartModel");
 const MessagingService = require("../services/messagingService");
+const StockService = require("../services/stockService");
+
+new StockService();
 
 class CartController {
   constructor() {
     this.cartService = new CartService();
+    this.stockService = new StockService();
+
     this.userId = "";
   }
 
@@ -88,7 +93,12 @@ class CartController {
       process.env.PUBLISHER_ROUTING_KEY,
       message
     );
-    
+    const stock = await this.stockService.getStockByKey({
+      productId: message.productId,
+    });
+    stock.stock -= message.quantity;
+    await stock.save();
+
     res.status(200).json({
       status: "success",
       message: "Product added to cart successfully",
@@ -110,7 +120,6 @@ class CartController {
         new ApiError(`There is no cart for this user id : ${this.userId}`, 404)
       );
     }
-
 
     res.status(200).json({
       status: "success",

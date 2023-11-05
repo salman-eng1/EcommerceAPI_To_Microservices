@@ -53,7 +53,7 @@ class SubCategoryService {
 
   async getSubCategoryByKey(key) { 
     try {
-      const subCategory = await this.subCategoryRepository.findOne(key); 
+      const subCategory = await this.subCategoryRepository.find(key); 
       return subCategory; 
     } catch (err) {
       console.log(`Database error while getting subCategory by ${key}`, err); 

@@ -1,5 +1,6 @@
 const CatalogRepository = require("../repositories/catalogRepository");
 const Product = require("../models/productModel"); // Change import to Product
+const messagingService = require("./messagingService");
 
 class ProductService {
   // Change class name to ProductService
@@ -8,12 +9,15 @@ class ProductService {
   }
 
   async createProduct(product) {
-    // Change method name
     try {
-      const createdProduct = await this.productRepository.create(product); // Change variable names
-      return createdProduct;
+      const createdProduct = await this.productRepository.create(product);
+      return createdProduct; // Return the created product
     } catch (err) {
-      console.log("DB Error >> Cannot create Product", err); // Change log message
+      console.log(
+        "error sending product information message when the product is created"
+      );
+      console.log("DB Error >> Cannot create Product", err);
+      throw err; // Rethrow the error so it can be handled by the caller
     }
   }
 
@@ -46,17 +50,25 @@ class ProductService {
       console.log("DB Error >> Cannot delete Product", err); // Change log message
     }
   }
-
   async updateProduct(productId, newData) {
-    // Change method name
     try {
-      const product = await this.productRepository.findByIdAndUpdate(
+      const updatedProduct = await this.productRepository.findByIdAndUpdate(
         productId,
         newData
-      ); // Change variable names
-      return product;
+      );
+
+      if (updatedProduct.quantity < 5) {
+        await messagingService.publishMessage(
+          process.env.EXCHANGE_NAME,
+          process.env.PUBLISHER_ROUTING_KEY,
+          { productId: updatedProduct.id, stock: updatedProduct.quantity }
+        );
+      }
+
+      return updatedProduct; // Return the updated product
     } catch (err) {
-      console.log("DB Error >> Cannot Update Product", err); // Change log message
+      console.log("DB Error >> Cannot Update Product", err);
+         console.log("An error occurred while updating the product")
     }
   }
 

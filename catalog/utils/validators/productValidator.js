@@ -1,12 +1,12 @@
 const slugify = require("slugify");
 const { check, body } = require("express-validator");
 const validatorMiddleware = require("../../middlewares/validatorMiddleware");
-const CategoryService=require("../../services/categoryService")
-const SubCategoryService=require("../../services/subCategoryService")
-const ProductService=require("../../services/productService")
-const categoryService=new CategoryService()
-const subCategoryService=new SubCategoryService()
-const productService=new ProductService()
+const CategoryService = require("../../services/categoryService");
+const SubCategoryService = require("../../services/subCategoryService");
+const ProductService = require("../../services/productService");
+const categoryService = new CategoryService();
+const subCategoryService = new SubCategoryService();
+const productService = new ProductService();
 
 class ProductValidator {
   createProductValidator = [
@@ -21,14 +21,14 @@ class ProductValidator {
         const product = await productService.getProductByKey({
           title: val,
         });
-  
+
         if (product && product.title === val) {
           throw Error("product already exists");
-        }else {
+        } else {
           return true;
         }
-      }),     
-    
+      }),
+
     check("description")
       .notEmpty()
       .withMessage("Product description is required")
@@ -89,25 +89,35 @@ class ProductValidator {
       ),
 
     check("subCategories")
-      .isEmpty()
+      .notEmpty()
       .isMongoId()
       .withMessage("Invalid subCategory ID formate")
-      .custom((subCategoryIds) =>
-        subCategoryService.getSubCategoryByKey({ _id: { $exists: true, $in: subCategoryIds } }).then(
-          //find will return documents
-          (result) => {
-            //result length equal
-            if (result.length < 1 || result.length !== subCategoryIds.length) {
-              return Promise.reject(new Error("invalid subCategory ids"));
-            }
-          }
-        )
+      .custom(
+        async (subCategoryIds) =>
+          await subCategoryService
+            .getSubCategoryByKey({
+              _id: { $exists: true, $in: subCategoryIds },
+            })
+            .then(
+              //find will return documents
+              (result) => {
+                console.log(subCategoryIds.length)
+                //result length equal
+                if (
+                  result.length < 1 ||
+                  result.length !== subCategoryIds.length
+                ) {
+                  return Promise.reject(new Error("invalid subCategory ids"));
+                }
+              }
+            )
       )
-      .custom((val, { req }) =>
-        subCategoryService.getSubCategoryByKey({ category: req.body.category }).then(
-          (subcategories) => {
+      .custom(async (val, { req }) => {
+        await subCategoryService
+          .getSubCategoryByKey({ category: req.body.category })
+          .then((subcategories) => {
             const subCategoriesIdsInDB = [];
-            subcategories.foreach((subCategory) => {
+            subcategories.forEach((subCategory) => {
               subCategoriesIdsInDB.push(subCategory._id.toString());
             });
 
@@ -118,9 +128,8 @@ class ProductValidator {
                 new Error("subCategory doesn't belong to category the ID")
               );
             }
-          }
-        )
-      ),
+          });
+      }),
 
     check("brand").optional().isMongoId().withMessage("Invalid ID formate"),
     check("ratingsAverage")
@@ -153,13 +162,55 @@ class ProductValidator {
         const product = await productService.getProductByKey({
           title: val,
         });
-  
+
         if (product && product.title === val) {
           throw Error("product already exists");
-        }else {
+        } else {
           return true;
         }
-      }),     
+      }),
+      check("subCategories")
+      .notEmpty()
+      .isMongoId()
+      .withMessage("Invalid subCategory ID formate")
+      .custom(
+        async (subCategoryIds) =>
+          await subCategoryService
+            .getSubCategoryByKey({
+              _id: { $exists: true, $in: subCategoryIds },
+            })
+            .then(
+              //find will return documents
+              (result) => {
+                console.log(subCategoryIds.length)
+                //result length equal
+                if (
+                  result.length < 1 ||
+                  result.length !== subCategoryIds.length
+                ) {
+                  return Promise.reject(new Error("invalid subCategory ids"));
+                }
+              }
+            )
+      )
+      .custom(async (val, { req }) => {
+        await subCategoryService
+          .getSubCategoryByKey({ category: req.body.category })
+          .then((subcategories) => {
+            const subCategoriesIdsInDB = [];
+            subcategories.forEach((subCategory) => {
+              subCategoriesIdsInDB.push(subCategory._id.toString());
+            });
+
+            const checker = (target, arr) =>
+              target.every((v) => arr.includes(v));
+            if (!checker(val, subCategoriesIdsInDB)) {
+              return Promise.reject(
+                new Error("subCategory doesn't belong to category the ID")
+              );
+            }
+          });
+      }),
     validatorMiddleware,
   ];
 

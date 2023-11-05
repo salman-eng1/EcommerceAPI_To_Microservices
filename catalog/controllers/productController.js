@@ -4,29 +4,11 @@ const asyncHandler = require("express-async-handler");
 const Product = require("../models/productModel");
 const ApiError = require("../utils/apiError");
 const ApiFeatures = require("../utils/apiFeatures");
+const messagingService = require("../services/messagingService");
+
 const { uploadMixOfImages } = require("../middlewares/uploadImageMiddlware");
 const ProductService = require("../services/productService");
 
-// const RabbitMQHandler = require("../utils/amqplib");
-// const RabbitMQCon = require("../utils/amqplibCon");
-// const amqpURL = process.env.amqpURL;
-
-  //  const connection =async()=>await MessagingService.connect(amqpURL).then( ()=>{
-  //   MessagingService.consume('Basket',()=>console.log("listening"))
-  //  }).catch((err)=>{
-  //   console.log(`connection failed: ${err}`)
-  //  });
-  //  connection()
-
-// exports.sendMsgToQueue = asyncHandler(async (req, res) => {
-//   const product = req.body;
-//   if (connection) {
-//     // Check if the connection is ready
-//     await RabbitMQCon.sendToQueue("Product", JSON.stringify(product));
-//   } else {
-//     console.error("RabbitMQ connection not ready.");
-//   }
-// });
 
 class ProductController {
   constructor() {
@@ -129,6 +111,11 @@ class ProductController {
   //access     private
   createProduct = asyncHandler(async (req, res) => {
     const product = await this.productService.createProduct(req.body);
+await messagingService.publishMessage(
+  process.env.EXCHANGE_NAME,
+  process.env.PUBLISHER_ROUTING_KEY,
+  { productId: product.id, stock: product.quantity }
+);
     res.status(201).json({ data: product });
   });
 
@@ -136,18 +123,15 @@ class ProductController {
   //@route     PUT .api/v1/products/:id
   //access     private
 
-  updateProduct = asyncHandler(async (req, res, next) => {
+  updateProduct = asyncHandler(async (req, res) => {
     const product = await this.productService.updateProduct(
       req.params.id,
       req.body
     );
-
     if (!product) {
-      return next(new ApiError(`No product for this id ${req.params.id}`, 404));
-    }
-    // Trigger "save" event when update product
-    product.save();
-    res.status(200).json({ data: product });
+      res.status(200).json({ message: `No product for this id ${req.params.id}, 404` });
+    }else{
+    res.status(200).json({ data: product });}
   });
 
   // @desc     update specific Products

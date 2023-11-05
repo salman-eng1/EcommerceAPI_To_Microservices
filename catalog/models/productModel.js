@@ -24,6 +24,7 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: [true, "product quantity is required"],
       default: 0,
+      min: [0,"this product is not available now"],
     },
     sold: {
       type: Number,
@@ -112,3 +113,5 @@ productSchema.pre(/^find/, function (next) {
   next();
 });
 module.exports = mongoose.model("Product", productSchema);
+
+
