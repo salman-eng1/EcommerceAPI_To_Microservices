@@ -4,13 +4,13 @@ const ApiError = require("../utils/apiError");
 const { axiosRequest } = require("../utils/axios");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
-const CartService = require("../services/cartService");
+const CategoryService = require("../services/categoryService");
 
 dotenv.config(".env");
 
 class IsAuthenticated {
   constructor() {
-    this.cartService = new CartService();
+    this.categoryService = new CategoryService();
     this.decoded = this.decoded;
     this.role = this.role;
   }
@@ -33,15 +33,12 @@ class IsAuthenticated {
           )
         );
       }
-      // 2) Verify token (no change happens, expired token)
-      this.decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
       const response = await axiosRequest(
         "get",
         `${process.env.authService}/api/v1/users/getMe`,
         token
       );
       this.role = response.data.data.role;
-      req.body.userId = response.data.data._id;
       next();
     } catch (err) {
       const message = err.response.data.message;

@@ -3,15 +3,13 @@ const ApiError = require("../utils/apiError");
 const CartService = require("../services/cartService");
 // const Coupon = require("../models/couponModel");
 const Cart = require("../models/cartModel");
-const MessagingService = require("../services/messagingService");
-const StockService = require("../services/stockService");
+const axios = require("axios");
 
-new StockService();
+const MessagingService = require("../services/messagingService");
 
 class CartController {
   constructor() {
     this.cartService = new CartService();
-    this.stockService = new StockService();
 
     this.userId = "";
   }
@@ -30,81 +28,87 @@ class CartController {
   // @route   POST /api/v1/cart
   // @access  Private/User
   addProductToCart = asyncHandler(async (req, res, next) => {
-    const { productId, productName, imageReference, color, price, quantity } =
-      req.body;
+    const { productId, color, quantity } = req.body;
     this.userId = req.body.userId;
+
     // 1) Get Cart for logged user
     let cart = await Cart.findOne({ userId: this.userId });
 
-    if (!cart) {
-      // create cart fot logged user with product
-      cart = await Cart.create({
-        userId: this.userId,
-        cartItems: [
-          {
+    const product = await axios.get(
+      `${process.env.catalogService}/api/v1/catalog/products/${productId}`
+    );
+    console.log(product);
+
+    const { price } = product.data.data;
+    const stock = product.data.data.quantity;
+    const difference = quantity - stock;
+    console.log(difference);
+    if (difference > 0) {
+      next(new ApiError("there is no available quantity from this product"));
+    } else {
+      if (!cart) {
+        // create cart fot logged user with product
+        cart = await Cart.create({
+          userId: this.userId,
+          cartItems: [
+            {
+              productId: productId,
+              color: color,
+              price: price,
+              quantity: quantity,
+            },
+          ],
+        });
+      } else {
+        // get the index of the product exist in cart, update product quantity
+        const productIndex = cart.cartItems.findIndex(
+          (item) =>
+            item.productId.toString() === productId && item.color === color
+        );
+
+        if (productIndex > -1) {
+          // update the quantity for this product
+          const cartItem = cart.cartItems[productIndex];
+          cartItem.quantity += quantity;
+
+          //replace the old document with the new one
+          cart.cartItems[productIndex] = cartItem;
+        } else {
+          // product not exist in cart,  push product to cartItems array
+          cart.cartItems.push({
             productId: productId,
             productName: productName,
             imageReference: imageReference,
             color: color,
             price: price,
             quantity: quantity,
-          },
-        ],
-      });
-    } else {
-      // get the index of the product exist in cart, update product quantity
-      const productIndex = cart.cartItems.findIndex(
-        (item) =>
-          item.productId.toString() === productId && item.color === color
+          });
+        }
+      }
+
+      // Calculate total cart price
+      this.calcTotalCartPrice(cart);
+      await cart.save();
+
+      const message = {
+        productId: productId,
+        color: color,
+        quantity: quantity,
+      };
+
+      await MessagingService.publishMessage(
+        process.env.EXCHANGE_NAME,
+        process.env.PUBLISHER_ROUTING_KEY,
+        message
       );
 
-      if (productIndex > -1) {
-        // update the quantity for this product
-        const cartItem = cart.cartItems[productIndex];
-        cartItem.quantity += quantity;
-
-        //replace the old document with the new one
-        cart.cartItems[productIndex] = cartItem;
-      } else {
-        // product not exist in cart,  push product to cartItems array
-        cart.cartItems.push({
-          productId: productId,
-          productName: productName,
-          imageReference: imageReference,
-          color: color,
-          price: price,
-          quantity: quantity,
-        });
-      }
+      res.status(200).json({
+        status: "success",
+        message: "Product added to cart successfully",
+        numOfCartItems: cart.cartItems.length,
+        data: cart,
+      });
     }
-
-    // Calculate total cart price
-    this.calcTotalCartPrice(cart);
-    await cart.save();
-
-    const message = {
-      productId: productId,
-      color: color,
-      quantity: quantity,
-    };
-
-    await MessagingService.publishMessage(
-      process.env.EXCHANGE_NAME,
-      process.env.PUBLISHER_ROUTING_KEY,
-      message
-    );
-    const stock = await this.stockService.getStockByKey({
-      productId: message.productId,
-    });
-    stock.stock -= message.quantity;
-    await stock.save();
-
-    res.status(200).json({
-      status: "success",
-      message: "Product added to cart successfully",
-      numOfCartItems: cart.cartItems.length,
-      data: cart,
-    });
   });
 
   // @desc    Get logged user cart

@@ -123,6 +123,7 @@ class UserController {
   // @route   GET /api/v1/users/getMe
   // @access  Private/Protect
   getLoggedUserData = asyncHandler(async (req, res, next) => {
+
     req.params.id = req.user._id;
     next();
   });

@@ -57,14 +57,6 @@ class ProductService {
         newData
       );
 
-      if (updatedProduct.quantity < 5) {
-        await messagingService.publishMessage(
-          process.env.EXCHANGE_NAME,
-          process.env.PUBLISHER_ROUTING_KEY,
-          { productId: updatedProduct.id, stock: updatedProduct.quantity }
-        );
-      }
-
       return updatedProduct; // Return the updated product
     } catch (err) {
       console.log("DB Error >> Cannot Update Product", err);

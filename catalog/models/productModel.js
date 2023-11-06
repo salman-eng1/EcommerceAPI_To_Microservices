@@ -25,6 +25,7 @@ const productSchema = new mongoose.Schema(
       required: [true, "product quantity is required"],
       default: 0,
       min: [0,"this product is not available now"],
+
     },
     sold: {
       type: Number,
