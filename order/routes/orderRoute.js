@@ -1,44 +1,39 @@
-// const express = require('express');
-// const {
-//   createCashOrder,
-//   findAllOrders,
-//   findSpecificOrder,
-//   filterOrderForLoggedUser,
-//   updateOrderToPaid,
-//   updateOrderToDelivered,
-//   checkoutSession,
-// } = require('../services/orderService');
+const express = require('express');
+const IsAuthenticated = require("../middlewares/isAuthenticated");
+const OrderController = require("../controllers/orderController");
 
-// const authService = require('../services/authService');
+const isAuthenticated=new IsAuthenticated()
+const orderController=new OrderController()
 
-// const router = express.Router();
+const router = express.Router();
 
-// router.use(authService.protect);
+router.use(isAuthenticated.protectService);
 
-// router.get(
-//   '/checkout-session/:cartId',
-//   authService.allowedTo('user'),
-//   checkoutSession
-// );
+router.get(
+  '/checkout-session/:cartId',
+  isAuthenticated.allowedTo('user'),
+  orderController.checkoutSession
+  
+);
 
-// router.route('/:cartId').post(authService.allowedTo('user'), createCashOrder);
-// router.get(
-//   '/',
-//   authService.allowedTo('user', 'admin', 'manager'),
-//   filterOrderForLoggedUser,
-//   findAllOrders
-// );
-// router.get('/:id', findSpecificOrder);
+router.route('/:cartId').post(isAuthenticated.allowedTo('user'), orderController.createCashOrder);
+router.get(
+  '/',
+  isAuthenticated.allowedTo('user', 'admin', 'manager'),
+  orderController.filterOrderForLoggedUser,
+  orderController.findAllOrders
+);
+router.get('/:id', orderController.findSpecificOrder);
 
-// router.put(
-//   '/:id/pay',
-//   authService.allowedTo('admin', 'manager'),
-//   updateOrderToPaid
-// );
-// router.put(
-//   '/:id/deliver',
-//   authService.allowedTo('admin', 'manager'),
-//   updateOrderToDelivered
-// );
+router.put(
+  '/:id/pay',
+  isAuthenticated.allowedTo('admin', 'manager'),
+  orderController.updateOrderToPaid
+);
+router.put(
+  '/:id/deliver',
+  isAuthenticated.allowedTo('admin', 'manager'),
+  orderController.updateOrderToDelivered
+);
 
-// module.exports = router;
+module.exports = router;

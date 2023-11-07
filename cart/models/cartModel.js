@@ -26,7 +26,7 @@ const cartSchema = new mongoose.Schema(
     totalCartPrice: Number,
     totalPriceAfterDiscount: Number,
     userId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
     },
   },
   { timestamps: true }

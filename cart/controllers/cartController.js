@@ -77,8 +77,6 @@ class CartController {
           // product not exist in cart,  push product to cartItems array
           cart.cartItems.push({
             productId: productId,
-            productName: productName,
-            imageReference: imageReference,
             color: color,
             price: price,
             quantity: quantity,
@@ -158,7 +156,8 @@ class CartController {
   // @route   DELETE /api/v1/cart
   // @access  Private/User
   clearCart = asyncHandler(async (req, res, next) => {
-    await this.cartService.deleteCart({ userId: this.userId });
+    const cart = await this.cartService.getCartByKey({ userId: this.userId });
+    await this.cartService.deleteCart(cart._id);
     res.status(204).send();
   });
 

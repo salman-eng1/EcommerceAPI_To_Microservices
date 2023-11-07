@@ -4,17 +4,16 @@ const ApiError = require("../utils/apiError");
 const { axiosRequest } = require("../utils/axios");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
-const CategoryService = require("../services/categoryService");
+const OrderService = require("../services/orderService");
 
 dotenv.config(".env");
 
 class IsAuthenticated {
   constructor() {
-    this.categoryService = new CategoryService();
+    this.orderService = new OrderService();
     this.decoded = this.decoded;
     this.role = this.role;
   }
-
   protectService = asyncHandler(async (req, res, next) => {
     try {
       // 1) Check if token exist, if exist get
@@ -33,12 +32,19 @@ class IsAuthenticated {
           )
         );
       }
+      // 2) Verify token (no change happens, expired token)
+      this.decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
       const response = await axiosRequest(
         "get",
         `${process.env.authService}/api/v1/users/getMe`,
         token
       );
       this.role = response.data.data.role;
+      req.body.role=this.role
+      req.body.userId = response.data.data._id;
+      req.body.userName = response.data.data.name;
+      req.body.userEmail = response.data.data.email;
+
       next();
     } catch (err) {
       const message = err.response.data.message;

@@ -1,8 +1,6 @@
 const amqplib = require("amqplib");
-const ProductService = require("./productService");
-var channel, connection;
 
-const productService=new ProductService()
+var channel, connection;
 
 exports.connect = async () => {
   connection = await amqplib.connect(process.env.amqpURL);
@@ -26,35 +24,12 @@ exports.createAndBindQueue = async (queueName, exchangeName, routingKey) => {
 };
 
 exports.consumeMessages = async (queueName) => {
-  await channel.consume(queueName, (msg) => {
+  await channel.consume(queueName, async (msg) => {
     if (msg) {
-      console.log(`Received: ${msg.content.toString()}`);
+      console.log(`Received: ${msg.content}`);
       // Acknowledge the message if it's processed successfully.
       channel.ack(msg);
-      const message = JSON.parse(msg.content);
-const products=message.productId
-const sold=message.soldQty
-if (message.soldQty){
- products.forEach((item,index)=>{
-  const product =  productService.updateProduct(
-    item,
-    {
-      
-      $inc: { sold: +sold[index] },
-    },
-  );
-})
-
-      }else{
-      const product = productService.updateProduct(
-        message.productId,
-        {
-          color: message.color,
-          $inc: { quantity: -message.quantity },
-        },
-        { new: true }
-      );
-    }}
+ }
   });
   console.log(`${queueName} queue consumer is listening`);
 };
@@ -70,4 +45,3 @@ exports.publishMessage = async (exchangeName, routingKey, message) => {
     // store the value in db table to be sent again later
   }
 };
-// 

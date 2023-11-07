@@ -27,8 +27,8 @@ class OrderService {
   async getAllOrders() {
     try {
       const orders = await this.orderRepository.findAll();
-      if(orders){
-        return orders
+      if (orders) {
+        return orders;
       }
     } catch (err) {
       console.log("DB Error >> Cannot get orders", err);
@@ -37,9 +37,7 @@ class OrderService {
 
   async deleteorder(orderId) {
     try {
-      const order = await this.orderRepository.findByIdAndDelete(
-        orderId
-      );
+      const order = await this.orderRepository.findByIdAndDelete(orderId);
 
       return order;
     } catch (err) {
@@ -69,7 +67,7 @@ class OrderService {
     }
   }
 
-  async getAllOrdersExceptOne(key) {
+  async getFilteredOrders(key) {
     try {
       const order = await this.orderRepository.find(key);
       return order; // Return true if key is unique, false if it already exists
