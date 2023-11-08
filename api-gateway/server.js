@@ -30,6 +30,12 @@ app.use(`/${api}/cart`, (req, res) => {
 app.use(`/${api}/orders`, (req, res) => {
   proxy.web(req, res, { target: `http://localhost:3003/${api}/orders` });
 });
+
+app.use(`/${api}/coupons`, (req, res) => {
+  proxy.web(req, res, { target: `http://localhost:3004/${api}/coupons` });
+});
+
+
 // Start the server
 const port = process.env.PORT || 2001;
 app.listen(port, () => {

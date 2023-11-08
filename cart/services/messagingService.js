@@ -1,5 +1,6 @@
 const amqplib = require("amqplib");
-
+const CouponService=require("../services/couponService")
+const couponService=new CouponService()
 var channel, connection;
 
 exports.connect = async () => {
@@ -29,6 +30,8 @@ exports.consumeMessages = async (queueName) => {
       console.log(`Received: ${msg.content}`);
       // Acknowledge the message if it's processed successfully.
       channel.ack(msg);
+      const message = JSON.parse(msg.content);
+      const createdCoupon = await couponService.createCoupon(message);
  }
   });
   console.log(`${queueName} queue consumer is listening`);

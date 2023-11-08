@@ -19,7 +19,7 @@ router
   .get(cartController.getLoggedUserCart)
   .delete(cartController.clearCart);
 
-// router.put("/applyCoupon", applyCoupon);
+router.put("/applyCoupon", cartController.applyCoupon);
 
 router
   .route("/:itemId")

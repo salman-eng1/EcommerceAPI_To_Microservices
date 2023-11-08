@@ -5,8 +5,7 @@ const mountRoutes = require("./routes");
 const morgan = require("morgan");
 dotenv.config(".env");
 const globalError = require("./middlewares/errorMiddleware");
-const OrderController = require('./controllers/orderController');
-const orderController=new OrderController
+dbConnection(process.env.DB_URI);
 
 const MessagingService = require("./services/messagingService");
 
@@ -18,19 +17,15 @@ const MessagingService = require("./services/messagingService");
   );
 })();
 
-dbConnection(process.env.DB_URI);
-
 const app = express();
+
 app.use(express.json());
+
+app.use(express.urlencoded({ extended: true }));
+
 app.use(morgan("dev"));
 
 mountRoutes(app);
-
-app.post(
-  '/webhook-checkout',
-  express.raw({ type: 'application/json' }),
-  orderController.webhookCheckout
-);
 
 app.all("*", (req, res, next) => {
   next(new Error(`Can't find this route: ${req.originalUrl}`, 400));
