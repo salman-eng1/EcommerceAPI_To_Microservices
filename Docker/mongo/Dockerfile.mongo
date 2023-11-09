@@ -1,0 +1,8 @@
+# Use the official MongoDB image as the base image
+FROM mongo:latest
+
+# Create a directory for MongoDB initialization scripts
+RUN mkdir -p /docker-entrypoint-initdb.d
+
+# Copy the MongoDB initialization script into the container
+COPY init-mongo.js ./docker-entrypoint-initdb.d
