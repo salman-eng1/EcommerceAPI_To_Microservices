@@ -18,10 +18,19 @@ app.use(`/${api}/users`, (req, res) => {
   proxy.web(req, res, { target: `http://localhost:3000/${api}/users` });
 });
 
+app.use(`/${api}/catalog/products/:productId/reviews`, (req, res) => {
+  const { productId } = req.params; // Extract the productId from the request parameters
+  const targetURL = `http://localhost:3005/${api}/reviews/${productId}/reviews`;
+
+  proxy.web(req, res, { target: targetURL });
+});
+
+
 // Route requests to the product service
 app.use(`/${api}/catalog`, (req, res) => {
   proxy.web(req, res, { target: `http://localhost:3001/${api}/catalog` });
 });
+
 
 // Route requests to the order service
 app.use(`/${api}/cart`, (req, res) => {
@@ -33,6 +42,10 @@ app.use(`/${api}/orders`, (req, res) => {
 
 app.use(`/${api}/coupons`, (req, res) => {
   proxy.web(req, res, { target: `http://localhost:3004/${api}/coupons` });
+});
+
+app.use(`/${api}/reviews`, (req, res) => {
+  proxy.web(req, res, { target: `http://localhost:3005/${api}/reviews` });
 });
 
 
