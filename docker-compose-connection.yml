@@ -1,0 +1,87 @@
+
+version: '3'
+
+services:
+  auth_mongo:
+    <<: &mongo_base
+      build:
+        context: .
+        dockerfile: auth/Dockerfile.db
+      container_name: auth_DB
+#      environment:
+ #       MONGO_INITDB_ROOT_USERNAME: mongo
+  #      MONGO_INITDB_ROOT_PASSWORD: mongo@suLY
+      networks:
+        - default
+      restart: always
+
+#  catalog_mongo:
+#    <<: *mongo_base
+#    build:
+#      context: .
+#      dockerfile: catalog/Dockerfile.db
+#    container_name: catalog_DB
+#    networks:
+#      - ecommerce_network
+#    restart: unless-stopped
+#
+#
+#  cart_mongo:
+#    <<: *mongo_base
+#    build:
+#      context: .
+#      dockerfile: cart/Dockerfile.db
+#    container_name: cart_DB
+#    networks:
+#      - ecommerce_network
+#    restart: always
+#
+#  coupon_mongo:
+#    <<: *mongo_base
+#    build:
+#      context: .
+#      dockerfile: coupons/Dockerfile.db
+#    container_name: coupon_DB
+#    networks:
+#      - ecommerce_network
+#    restart: always
+#
+#  order_mongo:
+#    <<: *mongo_base
+#    build:
+#      context: .
+#      dockerfile: order/Dockerfile.db
+#    container_name: order_DB
+#    networks:
+#      - ecommerce_network
+#    restart: always
+#
+#  review_mongo:
+#    <<: *mongo_base
+#    build:
+#      context: .
+#      dockerfile: review/Dockerfile.db
+#    container_name: review_DB
+#    networks:
+#      - ecommerce_network
+#    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3
+    container_name: rabbit
+    networks:
+      - default
+    hostname: rabbit
+    restart: always
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+
+networks:
+  default:
+    external:
+      name: minikube
+

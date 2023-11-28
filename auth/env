@@ -1,0 +1,18 @@
+PORT=3000
+BASE_URL=http://localhost:3000
+NODE_ENV=development
+DB_URI=mongodb://auth_user:mongo%40suLY@10.111.173.88:27017/auth_DB?authSource=auth_DB&authMechanism=SCRAM-SHA-256&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false
+JWT_SECRET_KEY=dev@salman@ops-jwt-nonpred-ictable
+JWT_EXPIRE_TIME=90d
+DB_HOST=10.111.173.88
+DB_PORT=27017
+DB_USER=auth_user
+DB_PASSWORD=mongo@suLY
+DB_NAME=auth_DB
+
+#email settings
+EMAIL_HOST=mail.zeour.co.uk
+EMAIL_PORT=465
+EMAIL_USER=noreply@zeour.co.uk
+EMAIL_PASSWORD=Temp@@2022
+

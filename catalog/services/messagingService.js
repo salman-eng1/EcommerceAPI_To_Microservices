@@ -4,8 +4,8 @@ var channel, connection;
 
 const productService = new ProductService();
 
-exports.connect = async () => {
-  connection = await amqplib.connect(process.env.amqpURL);
+exports.connect = async () => {                
+  connection = await amqplib.connect(`amqp://${process.env.RabbitMQ_USER}:${process.env.RabbitMQ_PASSWORD}@${process.env.RabbitMQ_HOST}:${process.env.RabbitMQ_PORT}`);
   channel = await connection.createChannel();
   console.log("MessagingService connection established successfully");
   return channel;

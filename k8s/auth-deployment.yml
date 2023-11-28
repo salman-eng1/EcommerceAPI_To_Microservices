@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: auth
+  template:
+    metadata:
+      labels:
+        component: auth
+    spec:
+      containers:
+        - name: auth
+          image: eng9/ecommerce_auth_app:build1
+          ports:
+            - containerPort: 3000
+          env:
+            - name: BASE_URL
+              value: http://localhost:3000     
+            - name: PORT
+              value: '3000'
+            - name: NODE_ENV
+              value: development
+
+            - name: DB_HOST
+              value: 10.100.231.6
+            - name: DB_PORT
+              value: '27017'
+            - name: DB_USER
+              value: auth_user
+            - name: DB_PASSWORD
+              value: mongo%40suLY
+            - name: DB_NAME
+              value: auth_DB
+
+
+            - name: EMAIL_HOST
+              value: mail.zeour.co.uk
+            - name: EMAIL_PORT
+              value: '465'
+            - name: EMAIL_USER
+              value: noreply@zeour.co.uk
+            - name: EMAIL_PASSWORD
+              value: Temp@@2022
+
+            - name: JWT_SECRET_KEY
+              value: dev@salman@ops-jwt-nonpred-ictable
+            - name: JWT_EXPIRE_TIME
+              value: 90d
+                  
+
+

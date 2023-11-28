@@ -31,7 +31,9 @@ exports.consumeMessages = async (queueName) => {
       // Acknowledge the message if it's processed successfully.
       channel.ack(msg);
       const message = JSON.parse(msg.content);
-      const createdCoupon = await couponService.createCoupon(message);
+      if (message.couponId){
+        const createdCoupon = await couponService.createCoupon(message);
+      }
  }
   });
   console.log(`${queueName} queue consumer is listening`);

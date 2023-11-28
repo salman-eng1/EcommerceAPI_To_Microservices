@@ -1,0 +1,88 @@
+
+version: '3'
+
+services:
+
+
+  api-gateway-service:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile.app
+    container_name: api-gateway
+    ports:
+      - "2000:3000"
+    networks:
+      - default
+    restart: always
+
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: auth/Dockerfile.app
+    container_name: auth
+    ports:
+      - "3001:3000"
+    networks:
+      - default
+    restart: always
+
+  catalog-service:
+    build:
+      context: .
+      dockerfile: catalog/Dockerfile.app
+    container_name: catalog
+    ports:
+      - "3002:3000"
+    networks:
+      - default
+    restart: always
+
+  cart-service:
+    build:
+      context: .
+      dockerfile: cart/Dockerfile.app
+    container_name: cart
+    ports:
+      - "3003:3000"
+    networks:
+      - default
+    restart: always
+
+  coupon-service:
+    build:
+      context: .
+      dockerfile: coupons/Dockerfile.app
+    container_name: coupon
+    ports:
+      - "3004:3000"
+    networks:
+      - default
+    restart: always
+
+  order-service:
+    build:
+      context: .
+      dockerfile: order/Dockerfile.app
+    container_name: order
+    ports:
+      - "3005:3000"
+    networks:
+      - default
+    restart: always
+
+  review-service:
+    build:
+      context: .
+      dockerfile: review/Dockerfile.app
+    container_name: review
+    ports:
+      - "3006:3000"
+    networks:
+      - default
+    restart: always
+
+networks:
+  default:
+    external:
+      name: minikube

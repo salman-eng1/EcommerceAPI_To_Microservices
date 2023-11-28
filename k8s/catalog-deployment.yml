@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: catalog
+  template:
+    metadata:
+      labels:
+        component: catalog
+    spec:
+      containers:
+        - name: catalog
+          image: eng9/ecommerce_catalog_app:build1
+          ports:
+            - containerPort: 3000
+          env:
+            - name: BASE_URL
+              value: http://localhost:3000     
+            - name: PORT
+              value: '3000'
+            - name: NODE_ENV
+              value: development
+
+            - name: DB_HOST
+              value: 10.100.231.6
+            - name: DB_PORT
+              value: '27017'
+            - name: DB_USER
+              value: auth_user
+            - name: DB_PASSWORD
+              value: mongo%40suLY
+            - name: DB_NAME
+              value: auth_DB
+
+            - name: EMAIL_HOST
+              value: mail.zeour.co.uk
+            - name: EMAIL_PORT
+              value: '465'
+            - name: EMAIL_USER
+              value: noreply@zeour.co.uk
+            - name: EMAIL_PASSWORD
+              value: Temp@@2022
+
+            - name: JWT_SECRET_KEY
+              value: dev@salman@ops-jwt-nonpred-ictable
+            - name: JWT_EXPIRE_TIME
+              value: 90d
+
+
+            - name: RabbitMQ_HOST
+              value: 10.96.135.57
+            - name: RabbitMQ_PORT
+              value: '5672'
+            - name: RabbitMQ_USER
+              value: guest
+            - name: RabbitMQ_PASSWORD
+              value: guest
+
+            - name: EXCHANGE_NAME
+              value: msgRouter
+            - name: EXCHANGE_TYPE
+              value: direct
+            - name: PUBLISHER_ROUTING_KEY
+              value: RAOGAqd1gJgls3BjCC
+            - name: CONSUMER_ROUTING_KEY
+              value: JJN4SD2S23SD3D8B1
+            - name: PUBLISHER_QUEUE_NAME
+              value: Basket
+            - name: CONSUMER_QUEUE_NAME
+              value: Catalog

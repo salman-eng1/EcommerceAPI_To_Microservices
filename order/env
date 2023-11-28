@@ -1,0 +1,24 @@
+PORT=3000
+BASE_URL=http://localhost:3000
+NODE_ENV=development
+DB_URI=mongodb://auth_user:mongo%40suLY@192.168.49.2:27017/auth_DB?authMechanism=DEFAULT
+JWT_SECRET_KEY=dev@salman@ops-jwt-nonpred-ictable
+JWT_EXPIRE_TIME=90d
+amqpURL=amqp://guest:guest@rabbit:5672
+authService=http://auth:3000
+cartService=http://cart:3000
+
+
+
+#Queue Settings
+EXCHANGE_NAME =msgRouter
+EXCHANGE_TYPE =direct
+CATALOG_ROUTING_KEY =JJN4SD2S23SD3D8B1
+BASKET_ROUTING_KEY =RAOGAqd1gJgls3BjCC
+
+
+CATALOG_QUEUE_NAME=Catalog
+BASKET_QUEUE_NAME=Basket
+
+STRIPE_SECRET=sk_test_51O3M2nC45wjKXrQT4YeXBWEChapJWQFLMqNEPIfohVP3XgqgEHYd4nVPGNGfC22ufqlEOX1kqBGin6Se24OpmUwV00yCFg3Cfp
+STRIPE_WEBHOOK_SECRET=whsec_08d5f83daf101a53c9d3e6a5eb5f569529eed272eb8e152cb07ba1f4e8bb10d5

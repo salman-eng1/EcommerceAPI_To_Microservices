@@ -22,7 +22,7 @@ const MessagingService = require("./services/messagingService");
   await MessagingService.consumeMessages(process.env.CONSUMER_QUEUE_NAME);
 })();
 
-dbConnection(process.env.DB_URI);
+dbConnection(`mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`);
 
 const app = express();
 app.use(express.json());

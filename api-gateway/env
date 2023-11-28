@@ -1,0 +1,13 @@
+PORT=3000
+BASE_URL=http://localhost:3000
+NODE_ENV=development
+
+
+AUTH_SERVICE=auth
+CATALOG_SERVICE=catalog
+
+CART_SERVICE=cart
+
+REVIEW_SERVICE=review
+COUPON_SERVICE=coupon
+ORDER_SERVICE=order

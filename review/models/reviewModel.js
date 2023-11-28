@@ -60,7 +60,7 @@ reviewSchema.statics.calcAverageRatingsAndQuantity = async function (
 
    await MessagingService.publishMessage(
       process.env.EXCHANGE_NAME,
-      process.env.BASKET_ROUTING_KEY,
+      process.env.CATALOG_ROUTING_KEY,
       message
     );
 
@@ -72,7 +72,7 @@ reviewSchema.statics.calcAverageRatingsAndQuantity = async function (
     };
     await MessagingService.publishMessage(
       process.env.EXCHANGE_NAME,
-      process.env.BASKET_ROUTING_KEY,
+      process.env.CATALOG_ROUTING_KEY,
       message
     );
   }

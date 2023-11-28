@@ -37,21 +37,25 @@ class OrderController {
     const taxPrice = 0;
     const shippingPrice = 0;
 
+let cart;
     // 1) Get cart depend on cartId
     const getCartData = await axiosRequest(
       "get",
       `${process.env.cartService}/api/v1/cart`,
       this.token
-    );
+    ).then((result)=>{
+       cart = result.data.data;
 
-    const cart = getCartData.data.data;
+    }).catch((err)=>{
+      next(new ApiError("your cart is empty",404))
+    });
+
 
     if (!cart) {
       return next(
         new ApiError(`There is no such cart with id ${req.params.cartId}`, 404)
       );
     }
-
     // 2) Get order price depend on cart price "Check if coupon apply"
     const cartPrice = cart.totalPriceAfterDiscount
       ? cart.totalPriceAfterDiscount

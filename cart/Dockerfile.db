@@ -1,0 +1,4 @@
+# Use the official MongoDB image as the base image
+FROM mongo:latest
+
+COPY cart/init-scripts/init-mongo.sh /docker-entrypoint-initdb.d/

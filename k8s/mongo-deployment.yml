@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: database
+  template:
+    metadata:
+      labels:
+        component: database
+    spec:
+  #    volumes:
+     #   - name: mongo-storage
+    #      persistentVolumeClaim:
+     #       claimName: database-persistent-volume-claim
+      containers:
+        - name: auth-mongo
+          image: eng9/ecommerce_auth_mongodb:build1
+          ports:
+            - containerPort: 27017
+
+      #    volumeMounts:
+     #       - name: mongo-storage
+     #         mountPath: /data/db
